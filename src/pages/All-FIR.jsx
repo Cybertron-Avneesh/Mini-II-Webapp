@@ -5,14 +5,18 @@ import {
   Table,
   TableContainer,
   Tbody,
-  Td, Th,
+  Td, Text, Th,
   Thead,
   Tr,
   useColorModeValue,
   VStack
 } from '@chakra-ui/react';
+import { ethers } from 'ethers';
+import { useContext, useEffect, useState } from 'react';
 import { FiExternalLink } from 'react-icons/fi';
+import { ContractAddressContext } from '../App';
 import SidebarWithHeader from '../components/Layout';
+import abi from '../utils/EvidenceContract.json';
 
 const rows = [
   {
@@ -31,45 +35,88 @@ const rows = [
 ];
 
 const AllFIR = () => {
+  const contractAddress = useContext(ContractAddressContext);
+  const [firs, setFIRs] = useState([]);
+  const contractABI = abi.abi;
+
+  const getFirDetails = async () => {
+    try {
+      const { ethereum } = window;
+      const provider = new ethers.providers.Web3Provider(ethereum);
+      const signer = provider.getSigner();
+      console.log('Signer: ', signer);
+      const contract = new ethers.Contract(
+        contractAddress,
+        contractABI,
+        signer
+      );
+      const loadedFirs = await contract.getAllFirs();
+      console.log('Loaded FIRs: ', loadedFirs);
+      let tmpFir = [];
+      for (let i = 0; i < loadedFirs.length; i++) {
+        tmpFir.push({
+          id: i,
+          title: loadedFirs[i].Title,
+          stationid: loadedFirs[i].stationid.toNumber(),
+        });
+      }
+      setFIRs(tmpFir);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    getFirDetails();
+  }, []);
   return (
     <>
       <SidebarWithHeader currActive={'/all-fir'}>
         <VStack>
           <Heading>All FIR Page!</Heading>
-          <Container maxW="container.lg"
-          rounded={'lg'}
-          bg={useColorModeValue('white', 'gray.700')}
-          boxShadow={'lg'}
-          p={8}>
-            <TableContainer>
-              <Table size="md" variant="striped">
-                <Thead>
-                  <Tr>
-                    <Th>FIR ID</Th>
-                    <Th>Station ID</Th>
-                    <Th>Title </Th>
-                    <Th>View</Th>
-                  </Tr>
-                </Thead>
-                <Tbody>
-                  {rows.map(row => (
-                    <Tr key={row.id}>
-                      <Td>{row.id}</Td>
-                      <Td>{row.stationid}</Td>
-                      <Td>{row.title}</Td>
-                      <Td>
-                        <Link
-                          href="/view-fir"
-                          style={{ textDecoration: 'none' }}
-                        >
-                          <FiExternalLink color="blue" />
-                        </Link>
-                      </Td>
+          <Container
+            maxW="container.lg"
+            rounded={'lg'}
+            bg={useColorModeValue('white', 'gray.700')}
+            boxShadow={'lg'}
+            p={8}
+          >
+            {firs.length === 0 && (
+              <Text align={'center'} fontSize="2xl">
+                Nothing to show!
+              </Text>
+            )}
+            {firs.length !== 0 && (
+              <TableContainer>
+                <Table size="md" variant="striped">
+                  <Thead>
+                    <Tr>
+                      <Th>FIR ID</Th>
+                      <Th>Station ID</Th>
+                      <Th>Title </Th>
+                      <Th>View</Th>
                     </Tr>
-                  ))}
-                </Tbody>
-              </Table>
-            </TableContainer>
+                  </Thead>
+                  <Tbody>
+                    {firs.map(row => (
+                      <Tr key={row.id}>
+                        <Td>{row.id}</Td>
+                        <Td>{row.stationid}</Td>
+                        <Td>{row.title}</Td>
+                        <Td>
+                          <Link
+                            href="/view-fir"
+                            style={{ textDecoration: 'none' }}
+                          >
+                            <FiExternalLink color="blue" />
+                          </Link>
+                        </Td>
+                      </Tr>
+                    ))}
+                  </Tbody>
+                </Table>
+              </TableContainer>
+            )}
           </Container>
         </VStack>
       </SidebarWithHeader>

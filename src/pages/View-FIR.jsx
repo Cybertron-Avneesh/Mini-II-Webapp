@@ -10,20 +10,11 @@ import {
   Image,
   Input,
   Spacer,
-  Table,
-  TableContainer,
-  Tag,
-  Tbody,
-  Td,
   Text,
-  Th,
-  Thead,
-  Tr,
   useColorModeValue,
   VStack,
   Wrap,
 } from '@chakra-ui/react';
-import { getDefaultNormalizer } from '@testing-library/react';
 import { ethers } from 'ethers';
 import { useContext, useState } from 'react';
 import { FiClock, FiPrinter, FiSearch } from 'react-icons/fi';
@@ -37,13 +28,15 @@ import IMAGE from '../images/IMAGE.png';
 import MULTIMEDIA from '../images/MULTIMEDIA.png';
 import abi from '../utils/EvidenceContract.json';
 toast.configure();
-
+const ipfsGateway = 'https://gateway.ipfs.io/ipfs/';
 const DUMMY_FIR_DATA = {
   firid: 'SOME FIXED STRING',
   title: '22 yr old went missing in the forest',
   description:
     'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
   stationid: 'ST_123_456',
+  station_name: 'Station Name',
+  station_location: 'Station Location',
   creator: '0x1234567890123456789012345678901234567890',
   time: '2020-01-01T00:00:00.000Z',
   evidences: [
@@ -136,17 +129,36 @@ const ViewFIR = () => {
         setFirData();
         return;
       }
-      fir.evidences_arr.forEach(async ev => {
-        console.log(ev.toNumber());
-        const evidence = await contract.evidences(ev.toNumber());
-        console.log(evidence);
-        const [TYPE, CID] = evidence.id.split('|');
-        tmpFirData.evidences.push({
-          evidencetype: TYPE,
-          evidenceCID: CID,
-          description: evidence.Title,
-        });
-      });
+      await Promise.all(
+        fir.evidences_arr.map(async ev => {
+          console.log(ev.toNumber());
+          const evidence = await contract.evidences(ev.toNumber());
+          console.log(evidence);
+          let [TYPE, CID] = evidence.id.split('|');
+          if (TYPE === evidence.id) {
+            CID = ipfsGateway + TYPE;
+          }
+          tmpFirData.evidences.push({
+            evidencetype: TYPE,
+            evidenceCID: CID,
+            description: evidence.Title,
+          });
+        })
+      );
+      const stationDetail = await contract.stations(tmpFirData.stationid);
+      tmpFirData.station_name = stationDetail.name;
+      tmpFirData.station_location = stationDetail.location;
+      // fir.evidences_arr.forEach(async ev => {
+      //   console.log(ev.toNumber());
+      //   const evidence = await contract.evidences(ev.toNumber());
+      //   console.log(evidence);
+      //   const [TYPE, CID] = evidence.id.split('|');
+      //   tmpFirData.evidences.push({
+      //     evidencetype: TYPE,
+      //     evidenceCID: CID,
+      //     description: evidence.Title,
+      //   });
+      // });
       // console.log(tmpFirData);
       setFirData(tmpFirData);
     } catch (e) {
@@ -265,6 +277,11 @@ const ViewFIR = () => {
                 <Text as={'code'} fontSize={'md'} isTruncated>
                   {firData.stationid}
                 </Text>
+                <Wrap>
+                  <Text>
+                    ({firData.station_name}, {firData.station_location})
+                  </Text>
+                </Wrap>
               </HStack>
               <VStack paddingLeft={4}>
                 <HStack alignSelf={'start'}>

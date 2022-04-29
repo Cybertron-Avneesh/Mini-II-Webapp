@@ -10,7 +10,7 @@ import {
   Stack,
   Textarea,
   useColorModeValue,
-  VStack
+  VStack,
 } from '@chakra-ui/react';
 import { ethers } from 'ethers';
 import { useContext, useState } from 'react';
@@ -87,7 +87,7 @@ const CreateFIR = () => {
       });
     }
   };
-  
+
   const submitHandler = e => {
     e.preventDefault();
     console.log(input);

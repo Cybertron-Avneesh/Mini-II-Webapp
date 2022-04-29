@@ -5,11 +5,13 @@ import {
   Table,
   TableContainer,
   Tbody,
-  Td, Text, Th,
+  Td,
+  Text,
+  Th,
   Thead,
   Tr,
   useColorModeValue,
-  VStack
+  VStack,
 } from '@chakra-ui/react';
 import { ethers } from 'ethers';
 import { useContext, useEffect, useState } from 'react';

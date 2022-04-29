@@ -9,6 +9,7 @@ import {
   HStack,
   Icon,
   IconButton,
+  Image,
   Link,
   Menu,
   MenuButton,
@@ -26,10 +27,11 @@ import {
   FiCpu,
   FiFileText,
   FiLayers,
-  FiUploadCloud,
   FiMenu,
   FiPlusCircle,
+  FiUploadCloud,
 } from 'react-icons/fi';
+import logo from '../images/logo.png';
 
 const LinkItems = [
   { name: 'Create FIR', icon: FiPlusCircle, to: '/create-fir' },
@@ -135,8 +137,9 @@ const SidebarContent = ({ onClose, currActive, ...rest }) => {
       {...rest}
     >
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
+        <Image src={logo} h={'12'}></Image>
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-          Mini
+          E M P
         </Text>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
@@ -253,7 +256,7 @@ const MobileNav = ({ onOpen, currentAccount, connectWallet, ...rest }) => {
         fontFamily="monospace"
         fontWeight="bold"
       >
-        Mini
+        E M P
       </Text>
 
       <HStack spacing={{ base: '0', md: '6' }}>

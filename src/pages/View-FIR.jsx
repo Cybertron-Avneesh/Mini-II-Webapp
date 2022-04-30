@@ -18,7 +18,7 @@ import {
 import { ethers } from 'ethers';
 import { useContext, useState } from 'react';
 import { FiClock, FiPrinter, FiSearch } from 'react-icons/fi';
-import { RiFullscreenFill, RiUser6Fill } from 'react-icons/ri';
+import { RiFullscreenFill, RiUser6Fill, RiDownload2Line } from 'react-icons/ri';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { ContractAddressContext } from '../App';
@@ -27,6 +27,9 @@ import DOCUMENT from '../images/DOCUMENT.png';
 import IMAGE from '../images/IMAGE.png';
 import MULTIMEDIA from '../images/MULTIMEDIA.png';
 import abi from '../utils/EvidenceContract.json';
+import { encryptFile, decryptFile } from '../utils/enc-dec';
+import { Web3Storage } from 'web3.storage';
+
 toast.configure();
 const ipfsGateway = 'https://gateway.ipfs.io/ipfs/';
 const DUMMY_FIR_DATA = {
@@ -103,6 +106,30 @@ const ViewFIR = () => {
     setFirId(e.target.value);
   };
 
+  const downloadEvidence = async (CID, passphrase) => {
+    if (!CID) {
+      toast.error('No CID found');
+      return;
+    }
+    toast.info('Starting download from IPFS.');
+    const token =
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweEI2NjMyQWYxRTdGRDY2MzQ0YTc1MUMyNUYxMWU0NzQ1QjM5ODAxNTciLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2NTEwNTgxNjE1OTksIm5hbWUiOiJNaW5pIFByb2plY3QgQVBJIFRva2VuIn0.xNpnrMvkZYPnrTKpoidL3VEYIMQDIOOL9bqpEyTt9Lw';
+    const client = new Web3Storage({ token });
+    const res = await client.get(CID);
+    const files = await res.files();
+    toast('Files downloaded successfully.');
+    toast.info('Initiating files decryption.');
+    console.log(files);
+    console.log('passphrase', passphrase);
+    const decryptedFiles = await Promise.all(
+      files.map(async objFile => {
+        const file = await decryptFile(objFile, passphrase);
+      })
+    );
+    toast('Files decrypted successfully.');
+    toast.info('Files downloaded to local machine.');
+  };
+
   const loadFIR = async () => {
     try {
       const { ethereum } = window;
@@ -131,16 +158,13 @@ const ViewFIR = () => {
       }
       await Promise.all(
         fir.evidences_arr.map(async ev => {
-          console.log(ev.toNumber());
           const evidence = await contract.evidences(ev.toNumber());
           console.log(evidence);
-          let [TYPE, CID] = evidence.id.split('|');
-          if (TYPE === evidence.id) {
-            CID = ipfsGateway + TYPE;
-          }
+          let [passphrase, CID] = evidence.id.split('|');
           tmpFirData.evidences.push({
-            evidencetype: TYPE,
+            evidencetype: 'MULTIMEDIA',
             evidenceCID: CID,
+            passphrase: passphrase,
             description: evidence.Title,
           });
         })
@@ -159,7 +183,7 @@ const ViewFIR = () => {
       //     description: evidence.Title,
       //   });
       // });
-      // console.log(tmpFirData);
+      console.log(tmpFirData);
       setFirData(tmpFirData);
     } catch (e) {
       console.log(e);
@@ -186,6 +210,7 @@ const ViewFIR = () => {
       return 'Time not available';
     }
   };
+
   const submitHandler = e => {
     e.preventDefault();
     console.log(firid);
@@ -357,9 +382,13 @@ const ViewFIR = () => {
                             width={'100px'}
                           ></Image>
                           <IconButton
-                            icon={<RiFullscreenFill />}
+                            icon={<RiDownload2Line />}
                             onClick={e => {
-                              window.open(evidence.evidenceCID, '_blank');
+                              // window.open(evidence.evidenceCID, '_blank');
+                              downloadEvidence(
+                                evidence.evidenceCID,
+                                evidence.passphrase
+                              );
                             }}
                           ></IconButton>
                         </VStack>

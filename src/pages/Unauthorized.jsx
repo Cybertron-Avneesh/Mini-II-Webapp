@@ -9,7 +9,7 @@ const Unauthorized = () => {
         bgGradient="linear(to-r, cyan.400, cyan.600)"
         backgroundClip="text"
       >
-        Err 4xx
+        Unauthorized Aceess Error
       </Heading>
       <Text fontSize="18px" mt={3} mb={2}>
         You are not authorized to access this page.
@@ -24,7 +24,7 @@ const Unauthorized = () => {
         color="white"
         variant="solid"
         as={Link}
-        href="/"
+        href="/connect-wallet"
       >
         Go to Home
       </Button>

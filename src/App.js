@@ -92,12 +92,11 @@ function App() {
               )}
               {!isAuthorised && (
                 <Route path="">
-                  <Route index element={<ConnectWallet />} />
+                  <Route index element={<Unauthorized />} />
                   <Route
                     path="/connect-wallet"
                     element={<ConnectWallet />}
                   ></Route>
-                  <Route path="/:anything" element={<Unauthorized />}></Route>
                 </Route>
               )}
             </Routes>

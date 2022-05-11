@@ -94,7 +94,6 @@ const StationDetail = () => {
   // };
 
   useEffect(() => {
-    // getCurrentAccount();
     getStationDetails();
   }, []);
 

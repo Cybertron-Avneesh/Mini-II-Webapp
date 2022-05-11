@@ -258,7 +258,6 @@ const ViewFIR = () => {
             </HStack>
           </Box>
         </Container>
-        {/* <Divider p={'2'} /> */}
         <Container
           maxW="container.md"
           rounded={'lg'}
@@ -384,7 +383,6 @@ const ViewFIR = () => {
                           <IconButton
                             icon={<RiDownload2Line />}
                             onClick={e => {
-                              // window.open(evidence.evidenceCID, '_blank');
                               downloadEvidence(
                                 evidence.evidenceCID,
                                 evidence.passphrase
@@ -396,29 +394,6 @@ const ViewFIR = () => {
                           <Wrap>
                             <Text>{evidence.description}</Text>
                           </Wrap>
-                          {/* <HStack alignSelf={'start'}>
-                            <Box
-                              padding={2}
-                              bg={'green.100'}
-                              rounded="full"
-                              color={'green.800'}
-                            >
-                              <FiClock />
-                            </Box>
-                            <Text> {evidence.timestamp}</Text>
-                          </HStack>
-                          <HStack alignSelf={'start'}>
-                            <Box
-                              padding={2}
-                              bg={'blue.100'}
-                              rounded="full"
-                              color={'blue.800'}
-                            >
-                              <RiUser6Fill />
-                            </Box>
-                            <Text as={'code'} fontSize={'md'}>{evidence.by} 
-                            </Text>
-                          </HStack> */}
                         </VStack>
                       </HStack>
                     </Box>
@@ -426,43 +401,6 @@ const ViewFIR = () => {
                 })}
               </VStack>
               <Spacer />
-              {/*
-              <Heading as={'h2'} size={'md'}>
-                Changelog
-              </Heading>
-
-               <TableContainer alignSelf={'center'}>
-                <Table size="sm" variant="striped">
-                  <Thead>
-                    <Tr>
-                      <Th>Action</Th>
-                      <Th>At</Th>
-                      <Th>By</Th>
-                    </Tr>
-                  </Thead>
-                  <Tbody>
-                    {firData.changelog.map(function (log, index) {
-                      return (
-                        <Tr>
-                          <Td>
-                            <Tag size="sm" key={index} variant={'outline'}>
-                              {log.action === 'CREATED'
-                                ? 'Created FIR'
-                                : log.action === 'ADDED'
-                                ? 'Added evidence'
-                                : 'Viewed'}
-                            </Tag>
-                          </Td>
-                          <Td>{log.timestamp}</Td>
-                          <Td>
-                            <Text as="code">{log.by}</Text>
-                          </Td>
-                        </Tr>
-                      );
-                    })}
-                  </Tbody>
-                </Table>
-              </TableContainer> */}
               <Divider />
             </VStack>
           )}
